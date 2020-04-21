@@ -1,0 +1,39 @@
+{
+    "$schema": "https://raw.githubusercontent.com/Microsoft/azure-pipelines-task-lib/master/tasks.schema.json",
+    "id": "7cb3751b-0c6f-4150-8128-ce3e71df7287",
+    "name": "GitCreateBranch",
+    "friendlyName": "Create Branch",
+    "description": "Task for creating a new branch",
+    "helpMarkDown": "",
+    "category": "Utility",
+    "author": "Phani Kumar",
+    "version": {
+        "Major": 0,
+        "Minor": 1,
+        "Patch": 0
+    },
+    "instanceNameFormat": "Echo $(samplestring)",
+    "inputs": [
+        {
+            "name": "samplestring",
+            "type": "string",
+            "label": "Sample String",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "A sample string"
+        },
+        {
+            "name": "connection",
+            "type": "connectedService:github:OAuth,OAuth2,PersonalAccessToken,Token",
+            "label": "GitHub Connection",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "GitHub service connection"
+        }
+    ],
+    "execution": {
+        "Node10": {
+            "target": "index.js"
+        }
+    }
+}
