@@ -35,19 +35,113 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 var tl = require("azure-pipelines-task-lib/task");
+var path = require("path");
+var Utility_1 = require("./Utility");
+//import httpClient = require("typed-rest-client/HttpClient");
+//import httpInterfaces = require("typed-rest-client/Interfaces");
+//import util = require("util");
+var requestPromise = __importStar(require("request-promise"));
+//import * as engine from 'artifact-engine/Engine';
+//import * as providers from 'artifact-engine/Providers';
+//import * as httpc from 'typed-rest-client/HttpClient';
 function run() {
     return __awaiter(this, void 0, void 0, function () {
-        var inputString;
+        var taskManifestPath, sourceVersion, repositoryURI, sourceBranchName, githubEndpoint, githubEndpointToken, repositoryName, inputString, newBranchName, endpoint_url, request_data, request_headers, options;
         return __generator(this, function (_a) {
             try {
-                inputString = tl.getInput('samplestring', true);
+                taskManifestPath = path.join(__dirname, "task.json");
+                tl.debug("Setting resource path to " + taskManifestPath);
+                tl.setResourcePath(taskManifestPath);
+                sourceVersion = tl.getInput("sourceVersion", true);
+                repositoryURI = tl.getInput("repositoryURI", true);
+                sourceBranchName = tl.getInput("sourceBranchName", true);
+                githubEndpoint = tl.getInput("connection", true);
+                githubEndpointToken = Utility_1.Utility.getGithubEndPointToken(githubEndpoint);
+                repositoryName = tl.getInput("repositoryName", true);
+                inputString = tl.getInput('repositoryName', true);
                 if (inputString == 'bad') {
                     tl.setResult(tl.TaskResult.Failed, 'Bad input was given');
                     return [2 /*return*/];
                 }
-                console.log('Hello', inputString);
+                newBranchName = tl.getInput("newBranchName", true);
+                endpoint_url = "https://api.github.com/repos/" + repositoryName + "/git/refs/heads";
+                request_data = JSON.stringify({ "ref": "refs/heads/" + newBranchName, "sha": sourceVersion });
+                request_headers = {
+                    "Content-Type": "application/json",
+                    "Authorization": "token $(githubEndpointToken)",
+                    "User-Agent": tl.getVariable("AZURE_HTTP_USER_AGENT")
+                };
+                console.log("printing repositoryURI");
+                console.log(repositoryURI);
+                console.log("printing githubEndpointToken");
+                console.log('Hello', githubEndpointToken);
+                console.log(githubEndpoint);
+                console.log(githubEndpointToken);
+                console.log("printing repositoryName");
+                console.log(repositoryName);
+                console.log("printing sourceVersion");
+                console.log(sourceVersion);
+                console.log("printing sourceBranchName");
+                console.log(sourceBranchName);
+                console.log(request_data);
+                console.log(endpoint_url);
+                options = {
+                    method: 'POST',
+                    uri: endpoint_url,
+                    body: request_data,
+                    headers: request_headers,
+                    json: true
+                };
+                requestPromise.post(options, function (error, response) {
+                    if (error) {
+                        console.log(error);
+                    }
+                    else {
+                        if (response.statusCode !== 200) {
+                            console.log(response.statusCode);
+                        }
+                        else {
+                            console.log(response);
+                        }
+                    }
+                });
+                /*
+                let proxyUrl: any = (tl.getVariable("agent.proxyurl")? tl.getVariable("agent.proxyurl") : "");
+                var getVariableTemp :any = tl.getVariable("agent.proxybypasslist");
+                var requestOptions: httpInterfaces.IRequestOptions = proxyUrl ? {
+                    proxy: {
+                        proxyUrl: proxyUrl,
+                        proxyUsername: tl.getVariable("agent.proxyusername"),
+                        proxyPassword: tl.getVariable("agent.proxypassword"),
+                        proxyBypassHosts: tl.getVariable("agent.proxybypasslist") ? JSON.parse(getVariableTemp) : null
+                    }
+                } : {};
+                var tempNulll :any =null;
+                //let retriableStatusCodes: number[] =  [408, 409, 500, 502, 503, 504];
+                //let ignoreSslErrors: any = tl.getVariable("VSTS_ARM_REST_IGNORE_SSL_ERRORS");
+                //requestOptions.ignoreSslError = ignoreSslErrors && ignoreSslErrors.toLowerCase() == "true";
+                //var httpCallbackClient = new httpClient.HttpClient(tl.getVariable("AZURE_HTTP_USER_AGENT"), tempNulll,requestOptions);
+                var httpCallbackClient = new httpClient.HttpClient(tl.getVariable("AZURE_HTTP_USER_AGENT"), tempNulll);
+                var response: httpClient.HttpClientResponse = await httpCallbackClient.request("POST", endpoint_url, request_data, request_headers);
+                let retryCount = 5
+                while (true){
+                    if (retriableStatusCodes.indexOf(response.statusCode) != -1 && ++i < retryCount) {
+                        tl.debug(util.format("Encountered a retriable status code: %s. Message: '%s'.", response.statusCode, response.statusMessage));
+                        await sleepFor(timeToWait);
+                        timeToWait = timeToWait * retryIntervalInSeconds + retryIntervalInSeconds;
+                        continue;
+                    }
+                }
+                */
             }
             catch (err) {
                 tl.setResult(tl.TaskResult.Failed, err.message);

@@ -2,8 +2,8 @@
     "manifestVersion": 1,
     "id": "build-release-task",
     "name": "Git Branch creation task",
-    "version": "0.0.1",
-    "publisher": "phani kumar",
+    "version": "0.0.19",
+    "publisher": "phanikumar",
     "targets": [
         {
             "id": "Microsoft.VisualStudio.Services"

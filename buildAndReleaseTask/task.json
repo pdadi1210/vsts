@@ -6,22 +6,14 @@
     "description": "Task for creating a new branch",
     "helpMarkDown": "",
     "category": "Utility",
-    "author": "Phani Kumar",
+    "author": "phaniKumar",
     "version": {
         "Major": 0,
         "Minor": 1,
-        "Patch": 0
+        "Patch": 1
     },
-    "instanceNameFormat": "Echo $(samplestring)",
+    "instanceNameFormat": "Git Branch $(Build.Repository.Name)",
     "inputs": [
-        {
-            "name": "samplestring",
-            "type": "string",
-            "label": "Sample String",
-            "defaultValue": "",
-            "required": true,
-            "helpMarkDown": "A sample string"
-        },
         {
             "name": "connection",
             "type": "connectedService:github:OAuth,OAuth2,PersonalAccessToken,Token",
@@ -29,6 +21,69 @@
             "defaultValue": "",
             "required": true,
             "helpMarkDown": "GitHub service connection"
+        },
+        {
+            "name": "newBranchName",
+            "type": "string",
+            "label": "New Branch Name",
+            "defaultValue": "refs/heads/-$(Build.BuildNumber)",
+            "required": true,
+            "properties": {
+                "EditableOptions": "True"
+            },  
+            "helpMarkDown": "GitHub repository full name"
+        },
+        {
+            "name": "repositoryURI",
+            "type": "string",
+            "label": "Repository URI",
+            "defaultValue": "$(Build.Repository.Uri)",
+            "required": true,
+            "properties": {
+                "EditableOptions": "True"
+            },  
+            "helpMarkDown": "GitHub repository full name"
+        },
+        {
+            "name": "repositoryName",
+            "type": "string",
+            "label": "Repository",
+            "defaultValue": "$(Build.Repository.Name)",
+            "required": true,
+            "properties": {
+                "EditableOptions": "True"
+            },  
+            "helpMarkDown": "GitHub repository full name"
+        },
+        {
+            "name": "sourceBranchName",
+            "type": "string",
+            "label": "BranchName",
+            "defaultValue": "$(Build.SourceBranch)",
+            "required": true,
+            "properties": {
+                "EditableOptions": "True"
+            },  
+            "helpMarkDown": "GitHub repository branch name"
+        },
+        {
+            "name": "sourceVersion",
+            "type": "string",
+            "label": "Build Commit",
+            "defaultValue": "$(Build.SourceVersion)",
+            "required": true,
+            "properties": {
+                "EditableOptions": "True"
+            },
+            "helpMarkDown": "GitHub repository branch name"
+        }
+    ],
+    "dataSourceBindings": [
+        {
+            "target": "repositoryName",
+            "endpointId": "$(gitHubConnection)",
+            "dataSourceName": "UserRepositories",
+            "resultTemplate": "{ \"Value\" : \"{{full_name}}\", \"DisplayValue\" : \"{{full_name}}\" }"
         }
     ],
     "execution": {
