@@ -46,13 +46,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var tl = require("azure-pipelines-task-lib/task");
 var path = require("path");
 var Utility_1 = require("./Utility");
-//import httpClient = require("typed-rest-client/HttpClient");
-//import httpInterfaces = require("typed-rest-client/Interfaces");
-//import util = require("util");
 var requestPromise = __importStar(require("request-promise"));
-//import * as engine from 'artifact-engine/Engine';
-//import * as providers from 'artifact-engine/Providers';
-//import * as httpc from 'typed-rest-client/HttpClient';
 function run() {
     return __awaiter(this, void 0, void 0, function () {
         var taskManifestPath, sourceVersion, repositoryURI, sourceBranchName, githubEndpoint, githubEndpointToken, repositoryName, inputString, newBranchName, endpoint_url, request_data, request_headers, options;
@@ -73,19 +67,15 @@ function run() {
                     return [2 /*return*/];
                 }
                 newBranchName = tl.getInput("newBranchName", true);
-                endpoint_url = "https://api.github.com/repos/" + repositoryName + "/git/refs/heads";
-                request_data = JSON.stringify({ "ref": "refs/heads/" + newBranchName, "sha": sourceVersion });
-                request_headers = {
-                    "Content-Type": "application/json",
-                    "Authorization": "token $(githubEndpointToken)",
-                    "User-Agent": tl.getVariable("AZURE_HTTP_USER_AGENT")
-                };
+                endpoint_url = "https://api.github.com/repos/" + repositoryName + "/git/refs";
+                request_data = { "ref": "refs/heads/" + newBranchName, "sha": sourceVersion };
+                request_headers = { 'Content-Type': 'application/json', 'Authorization': 'token ' + githubEndpointToken, 'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0' };
                 console.log("printing repositoryURI");
                 console.log(repositoryURI);
                 console.log("printing githubEndpointToken");
-                console.log('Hello', githubEndpointToken);
-                console.log(githubEndpoint);
-                console.log(githubEndpointToken);
+                //console.log('Hello', githubEndpointToken);
+                //console.log(githubEndpoint)
+                //console.log(githubEndpointToken)
                 console.log("printing repositoryName");
                 console.log(repositoryName);
                 console.log("printing sourceVersion");
@@ -95,7 +85,7 @@ function run() {
                 console.log(request_data);
                 console.log(endpoint_url);
                 options = {
-                    method: 'POST',
+                    method: "POST",
                     uri: endpoint_url,
                     body: request_data,
                     headers: request_headers,
@@ -150,4 +140,5 @@ function run() {
         });
     });
 }
-run();
+run().then(function () { return tl.setResult(tl.TaskResult.Succeeded, ''); })
+    .catch(function (error) { return tl.setResult(tl.TaskResult.Failed, error.message); });

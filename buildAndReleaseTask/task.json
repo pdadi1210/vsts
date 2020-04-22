@@ -16,7 +16,7 @@
     "inputs": [
         {
             "name": "connection",
-            "type": "connectedService:github:OAuth,OAuth2,PersonalAccessToken,Token",
+            "type": "connectedService:github:OAuth,OAuth2,PersonalAccessToken,InstallationToken,Token",
             "label": "GitHub Connection",
             "defaultValue": "",
             "required": true,
@@ -26,7 +26,7 @@
             "name": "newBranchName",
             "type": "string",
             "label": "New Branch Name",
-            "defaultValue": "refs/heads/-$(Build.BuildNumber)",
+            "defaultValue": "release-$(Build.BuildNumber)",
             "required": true,
             "properties": {
                 "EditableOptions": "True"

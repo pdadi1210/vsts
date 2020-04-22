@@ -1,14 +1,8 @@
 import tl = require('azure-pipelines-task-lib/task');
 import path = require('path');
 import { Utility } from './Utility';
-//import httpClient = require("typed-rest-client/HttpClient");
-//import httpInterfaces = require("typed-rest-client/Interfaces");
-//import util = require("util");
 import * as requestPromise from 'request-promise';
-//import * as engine from 'artifact-engine/Engine';
-//import * as providers from 'artifact-engine/Providers';
-//import * as httpc from 'typed-rest-client/HttpClient';
-
+import { stringify } from 'querystring';
 async function run() {
     try {
         var taskManifestPath = path.join(__dirname, "task.json");
@@ -18,7 +12,7 @@ async function run() {
         const repositoryURI = tl.getInput("repositoryURI", true);
         const sourceBranchName = tl.getInput("sourceBranchName", true);
         const githubEndpoint :any= tl.getInput("connection", true);
-        const githubEndpointToken = Utility.getGithubEndPointToken(githubEndpoint);
+        const githubEndpointToken =  Utility.getGithubEndPointToken(githubEndpoint);
         const repositoryName = tl.getInput("repositoryName", true);
         const inputString: string | undefined = tl.getInput('repositoryName', true);
         if (inputString == 'bad') {
@@ -26,19 +20,15 @@ async function run() {
             return;
         }
         const newBranchName = tl.getInput("newBranchName", true);
-        let endpoint_url = "https://api.github.com/repos/"+repositoryName+"/git/refs/heads";
-        let request_data :any = JSON.stringify({ "ref":"refs/heads/"+newBranchName,"sha": sourceVersion});
-        let request_headers = {
-            "Content-Type": "application/json",
-            "Authorization": `token $(githubEndpointToken)`,
-            "User-Agent": tl.getVariable("AZURE_HTTP_USER_AGENT")
-        };
+        let endpoint_url = "https://api.github.com/repos/"+repositoryName+"/git/refs";
+        let request_data :any = { "ref" : "refs/heads/"+newBranchName,"sha" : sourceVersion};
+        let request_headers = {'Content-Type' : 'application/json','Authorization' : 'token '+githubEndpointToken,'User-Agent' : 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0'};
         console.log("printing repositoryURI");
         console.log(repositoryURI);
         console.log("printing githubEndpointToken");
-        console.log('Hello', githubEndpointToken);
-        console.log(githubEndpoint)
-        console.log(githubEndpointToken)
+        //console.log('Hello', githubEndpointToken);
+        //console.log(githubEndpoint)
+        //console.log(githubEndpointToken)
         console.log("printing repositoryName");
         console.log(repositoryName)
         console.log("printing sourceVersion");
@@ -48,7 +38,7 @@ async function run() {
         console.log(request_data)
         console.log(endpoint_url)
         var options = {
-            method: 'POST',
+            method: "POST",
             uri: endpoint_url,
             body: request_data,
             headers: request_headers,
@@ -99,4 +89,5 @@ async function run() {
     }
 }
 
-run();
+run() .then(() => tl.setResult(tl.TaskResult.Succeeded, ''))
+.catch((error: Error) => tl.setResult(tl.TaskResult.Failed, error.message));
